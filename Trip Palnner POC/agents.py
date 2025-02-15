@@ -1,5 +1,8 @@
+import os
 from crewai import Agent
 from textwrap import dedent
+from langchain import LangChain
+from langchain.llms import DeepSeek
 from langchain_openai import ChatOpenAI
 
 from tools.search_tools import SearchTools
@@ -35,6 +38,12 @@ Notes:
 
 class TravelAgents:
     def __init__(self):
+        # self.deepseek_model = DeepSeek(api_key=os.environ('DEEPSEEK_API_KEY'))
+        self.deepseek_model = DeepSeek(
+            api_key=os.environ('DEEPSEEK_API_KEY'),
+            model_name="deepseek-reasoner",
+            temperature=0.7
+)
         self.OpenAIGPT35 = ChatOpenAI(
             model_name="gpt-3.5-turbo", temperature=0.7)
         self.OpenAIGPT4 = ChatOpenAI(model_name="gpt-4", temperature=0.7)
@@ -54,7 +63,7 @@ class TravelAgents:
                 CalculatorTools.calculate
             ],
             verbose=True,
-            llm=self.OpenAIGPT4,
+            llm=self.deepseek_model,
         )
 
     def city_selection_expert(self):
@@ -66,7 +75,7 @@ class TravelAgents:
                 f"""Select the best cities based on weather, season, prices, and traveler interests"""),
             tools=[SearchTools.search_internet],
             verbose=True,
-            llm=self.OpenAIGPT4,
+            llm=self.deepseek_model,
         )
 
     def local_tour_guide(self):
@@ -78,5 +87,5 @@ class TravelAgents:
                 f"""Provide the BEST insights about the selected city"""),
             tools=[SearchTools.search_internet],
             verbose=True,
-            llm=self.OpenAIGPT4,
+            llm=self.deepseek_model,
         )
